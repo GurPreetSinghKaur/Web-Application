@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="layout.css">
+    <meta name="description" content="All type of phones available">
+    <meta name="keywords" content="Apple, iPhone,Smart,Phones,New,Mobiles">
+
+    <!-- Vue development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- Axios library -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+    <title>Smart Phones</title>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <div class="contain">
+
+                <div id="tophead">
+                    <h1><span class="focus">Smart</span> Phones </h1>
+                </div>
+                <nav>
+
+                    <ul>
+                        <li><a v-bind:class="{focus:currentPage === 'Home'}" href="#" v-on:click="currentPage = 'Home'"> Home </a></li>
+                        <li><a v-bind:class="{focus:currentPage === 'Phones'}" href="#" v-on:click="currentPage = 'Phones'"> Phones</a></li>
+                        <li><a v-bind:class="{focus:currentPage === 'Search'}" href="#" v-on:click="currentPage = 'Search'"> Search </a></li>
+                    </ul>
+
+
+                </nav>
+            </div>
+        </header>
+
+        <div v-show="currentPage === 'Phones'">
+            <!-- Phones page code -->
+            <article id="info">
+                <h1>View all iPhones</h1>
+
+
+                <div class="pagination">
+                    <a>Displaying Page {{active}} Of {{Pages}}</a>
+                    <a v-for="page in page" href="#" @click="active = page" v-bind:class="{active:active === page}">
+                    {{page}}
+                </a>
+
+                </div>
+
+                <p>
+                    <strong>Items Per Page:</strong>
+                    <select v-model="itemsPerPage">
+                    <option disabled value="">Amount</option>
+                    <option v-for="(selectedValue, key) in userOrder"    >
+                        {{selectedValue}}
+                </select>
+                </p>
+
+            </article>
+
+            <section class="phoneBoxes">
+
+                <div>
+                    <div class="box" v-for="phone in phones">
+
+                        <img v-bind:src="phone.image">
+                        <h3>{{phone.brand}}</h3>
+
+                        <p> {{phone.model}} {{phone.storage}} {{phone.colour}}
+
+                        </p>
+                        <!-- Trigger/Open The Modal -->
+                        <button @click="modalPhone = phone" class="buttons" onclick="model()" class="myBtn">  £{{phone.minimumPrice}}</button>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <div v-show="currentPage === 'Home'">
+            <!-- Home page code -->
+
+
+            <section id="intro">
+                <div class="contain">
+                    <h1>Get the best Apple iPhone prices </h1>
+                    <p>We analyse data from different sellers in order to provide you with the best deal</p>
+                </div>
+            </section>
+
+            <div id="indexBar"> </div>
+
+            <h1 id="introText"> Selling Fast</h1>
+
+
+            <section class="phoneBoxes">
+
+
+
+                <div>
+                    <div class="box" v-for="phone in homeProducts">
+
+                        <img v-bind:src="phone.image">
+                        <h3>{{phone.brand}}</h3>
+
+                        <p> {{phone.model}} {{phone.storage}} {{phone.colour}}
+                        </p>
+                        <!-- Trigger/Open The Modal -->
+                        <button @click="modalPhone = phone" class="buttons" onclick="model()" class="myBtn">  £ {{parseFloat(phone.minimumPrice).toFixed(2)}}</button>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+
+        <div v-show="currentPage === 'Search'">
+            <!-- Search page code -->
+
+            <section id="promotion">
+                <div class="contain">
+                    <h1>Search through our products</h1>
+                    <form>
+                        <input type="text" v-model="search" placeholder="Search..."> {{userSearch}}
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="phoneBoxes">
+
+                <div>
+                    <div class="box" v-for="phone in searchResult">
+
+                        <img v-bind:src="phone.image">
+                        <h3>{{phone.brand}}</h3>
+
+                        <p> {{phone.model}} {{phone.storage}} {{phone.colour}}
+                        </p>
+                        <!-- Trigger/Open The Modal -->
+                        <button @click="modalPhone = phone" class="buttons" onclick="model()" class="myBtn">  £ {{parseFloat(phone.minimumPrice).toFixed(2)}}</button>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+
+        <!--  modal  -->
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            {{Modals}}
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="selectedProductModel">
+                    <h3 class="post-title">{{modalPhone.brand}} {{modalPhone.model}} {{modalPhone.storage}} {{modalPhone.colour}}</h3>
+                    <div class="post-thumb"> <img v-bind:src="modalPhone.image"> </div>
+                    <div class="post-content">
+                        <h3>{{modalPhone.brand}}</h3>
+                        <p>
+                            {{modalPhone.model}} {{modalPhone.storage}} {{modalPhone.colour}}
+                        </p>
+                    </div>
+
+                </div>
+                <h4>Available At</h4>
+                <div class="post-modal" v-for="phone in ModalDataSorted">
+
+                    <form v-bind:action="phone.websiteUrl" target="_blank">
+                        £{{phone.price}}
+                        <input class="buttons" type="submit" value="Go" />
+                    </form>
+                    <h3>{{phone.website}}</h3>
+                    <p>{{phone.brand}} {{phone.model}} {{phone.storage}} {{phone.colour}}
+                    </p>
+                </div>
+
+                <h4>Similar Products</h4>
+                <div class="post-modal" v-for="phone in SimilarProducts">
+
+                    <form v-bind:action="phone.websiteUrl" target="_blank">
+                        £{{phone.minimumPrice}}
+                        <input class="buttons" type="submit" value="Go" />
+                    </form>
+                    <h3>{{phone.website}}</h3>
+                    <p>{{phone.brand}} {{phone.model}} {{phone.storage}} {{phone.colour}}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p> Smart Phones, Copyright &copy; 2021</p>
+        <div id="theme">
+            <p>Change Theme</p>
+            <div class="colorBlock" id="Grey"></div>
+            <div class="colorBlock" id="Cream"></div>
+            <div class="colorBlock" id="Purple"></div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
+
+
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script>
+    //Create function that listens for a click on anything with the class colorBlock
+    $(".colorBlock").click(function() /*Vanilla js | event that listens for a click */ {
+        //Get the background color of the clicked color block by using the this object
+        var $backgroundColor = $(this).css("background-color"); /* JQuery using css("Propertyname"); to get the property */
+        //Set the body's background-color to the received background-color
+        $("footer").css("background-color", $backgroundColor); /*  css("propertyname","value"); to set a new value for all matched elements*/
+        var $headercolor = $(this).css("border-bottom");
+        $("header").css("border-bottom", $headercolor);
+
+        var $barcolor = $(this).css("background-color");
+        $("#indexBar").css("background-color", $barcolor);
+
+        var $focuscolor = $(this).css("color");
+        $(".focus").css("color", $focuscolor);
+
+        //   var $buttoncolor= $(this).css("background-color");
+        $(".buttons").css("background-color", $backgroundColor);
+
+    });
+</script>
+
+
+<script>
+    //Script for VUE.JS
+
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            phones: [],
+            modalData: [],
+            modalPhone: [],
+            searchResult: [],
+            active: 1,
+            currentPage: 'Home',
+            userOrder: {
+                a: 35,
+                b: 45,
+                c: 100
+            },
+            isactive: true,
+            page: '',
+            search: '',
+            itemsPerPage: 35,
+            totalItemsInDB: '',
+
+        },
+        computed: {
+            userSearch() {
+                if (!this.search) {
+                    return console.log("No search ")
+                }
+                var localApp = this;
+
+                fetch('https://restfulapi-production-093d.up.railway.app/search/?search=' + this.search + '', {
+                        method: 'GET'
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+                            console.log('Success')
+                        } else {
+                            console.log('Error fetching data')
+                        }
+
+                        return response.json();
+                    })
+                    .then(function(json) {
+
+                        console.log(json)
+                        localApp.searchResult = json;
+
+                    })
+
+            },
+            homeProducts() {
+                return this.phones.slice(0, 13)
+            },
+            Modals() {
+
+                if (!this.modalPhone.id) {
+                    return console.log("No Id ")
+                }
+                let id = this.modalPhone.id;
+                console.log(id + 'this is the id')
+                var localApp = this;
+                fetch('https://restfulapi-production-093d.up.railway.app/phone/' + id, {
+                        method: 'GET'
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+                            console.log('Successfully fetched the Data')
+                        } else {
+                            console.log('Error fetching data')
+                        }
+
+                        return response.json();
+                    })
+                    .then(function(json) {
+                        // use the json
+                        console.log(json)
+                        localApp.modalData = json;
+
+                    }).catch(function(error) {
+                        //Handle error
+                        console.log(error);
+                    });
+
+            },
+            ModalDataSorted() {
+
+                function compare(a, b) {
+                    if (a.price > b.price) return 1;
+                    if (a.price < b.price) return -1;
+                    return 0;
+                }
+
+                return this.modalData.sort(compare);
+
+            },
+            SimilarProducts() {
+
+                let tmpArr = this.phones.filter(item =>
+                    item.model.includes(this.modalPhone.model))
+
+                function compare(a, b) {
+                    if (a.price > b.price) return 1;
+                    if (a.price < b.price) return -1;
+                    return 0;
+                }
+
+                return tmpArr.slice(0, 3).sort(compare).reverse();
+            },
+            Pages() {
+
+                var localApp = this;
+                let tmp = this.active * this.itemsPerPage - this.itemsPerPage;
+
+                fetch('https://restfulapi-production-093d.up.railway.app/phone/?num_items=' + this.itemsPerPage + '&offset=' + tmp + '', {
+                        method: 'GET'
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+                            console.log('Success')
+                        } else {
+                            console.log('Error fetching data')
+                        }
+
+                        return response.json();
+                    })
+                    .then(function(json) {
+                        // use the json
+                        localApp.totalItemsInDB = json.totNumItems;
+                        localApp.phones = json.data;
+
+                    })
+
+                return this.page = Math.ceil(this.totalItemsInDB / this.itemsPerPage)
+
+            },
+
+        },
+        created: function() { //Vue lifecycle hook, called when data is loaded.
+
+            this.Pages;
+
+        }
+
+    })
+</script>
+
+<script>
+    function model() {
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+
+        modal.style.display = "block";
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+</script>
